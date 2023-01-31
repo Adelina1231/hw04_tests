@@ -14,13 +14,14 @@ class PaginatorViewsTest(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
-        for num_of_post in range(13):
-            cls.post = Post.objects.create(
+        posts = [
+            Post(
                 author=cls.user,
                 text=f'Тестовый пост {num_of_post}',
-                id=num_of_post,
                 group=cls.group
-            )
+            ) for num_of_post in range(13)
+        ]
+        cls.post = Post.objects.bulk_create(posts)
         cls.list_of_reverses = [
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': cls.group.slug}),

@@ -49,6 +49,9 @@ class PostFormTests(TestCase):
         self.assertRedirects(response, reverse('posts:profile',
                              kwargs={'username': self.user}))
         self.assertEqual(Post.objects.count(), post_count + 1)
+        new_post = Post.objects.last()
+        self.assertEqual(new_post.author, self.user)
+        self.assertEqual(new_post.group, self.group)
 
     def test_post_edit(self) -> None:
         """Валидная форма редактирует пост и меняет группу."""
@@ -68,3 +71,15 @@ class PostFormTests(TestCase):
         self.assertEqual(post.text, form_data['text'])
         self.assertEqual(post.author.username, self.user.username)
         self.assertEqual(post.group, self.group_2)
+        old_group_response = self.authorized_client.get(
+            reverse('posts:group_list', args=(self.group.slug,))
+        )
+        new_group_response = self.authorized_client.get(
+            reverse('posts:group_list', args=(self.group_2.slug,))
+        )
+        self.assertEqual(
+            old_group_response.context['page_obj'].paginator.count, 0
+        )
+        self.assertEqual(
+            new_group_response.context['page_obj'].paginator.count, 1
+        )
