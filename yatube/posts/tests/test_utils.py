@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.core.cache import cache
 
 from ..models import Post, Group, User
 
@@ -29,6 +30,7 @@ class PaginatorViewsTest(TestCase):
         ]
 
     def setUp(self):
+        cache.clear()
         self.guest_client = Client()
 
     def test_first_page_contains_ten_records(self):
